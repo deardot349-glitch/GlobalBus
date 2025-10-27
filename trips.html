@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="uk" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlobalBus — Усі маршрути</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        body { font-family: 'Roboto', sans-serif; }
+        .route-card { transition: all 0.2s ease; }
+        .route-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] summary .chev { transform: rotate(180deg); }
+        .chip { background:#eef2ff; color:#3730a3; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <a href="index.html#home" class="text-2xl font-bold text-blue-900">Global<span class="text-blue-600">Bus</span></a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html#about" class="text-gray-700 hover:text-blue-600 font-medium">Про нас</a>
+                    <a href="trips.html" class="text-blue-600 font-semibold">Маршрути</a>
+                    <a href="index.html#reviews" class="text-gray-700 hover:text-blue-600 font-medium">Відгуки</a>
+                    <a href="index.html#contact" class="text-gray-700 hover:text-blue-600 font-medium">Контакти</a>
+                </div>
+                <div class="hidden md:block">
+                    <a href="index.html#booking" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-medium transition duration-300 shadow-lg hover:shadow-xl">Забронювати</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="menuBtn" class="text-gray-700 focus:outline-none"><i class="fas fa-bars text-2xl"></i></button>
+                </div>
+            </div>
+            <div id="mobileMenu" class="hidden md:hidden bg-white py-6 px-6 fixed inset-0 shadow-lg border-t z-40 overflow-y-auto">
+                <div class="flex flex-col space-y-4">
+                    <a href="index.html#about" class="text-gray-800 text-lg hover:text-blue-600 font-medium">Про нас</a>
+                    <a href="trips.html" class="text-gray-800 text-lg hover:text-blue-600 font-medium">Маршрути</a>
+                    <a href="index.html#reviews" class="text-gray-800 text-lg hover:text-blue-600 font-medium">Відгуки</a>
+                    <a href="index.html#contact" class="text-gray-800 text-lg hover:text-blue-600 font-medium">Контакти</a>
+                    <a href="index.html#booking" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-semibold text-center">Забронювати</a>
+                    <button id="closeMobileMenu" class="mt-6 text-gray-500">Закрити</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-blue-900 text-white py-14">
+        <div class="container mx-auto px-4">
+            <h1 class="text-3xl md:text-4xl font-bold">Знайдіть свій маршрут</h1>
+            <p class="text-blue-200 mt-2">20+ популярних напрямків щодня</p>
+        </div>
+    </header>
+
+    <!-- Search & Filters -->
+    <section class="py-6 bg-white shadow-sm">
+        <div class="container mx-auto px-4">
+            <form id="filters" class="grid grid-cols-1 md:grid-cols-6 gap-3">
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Звідки</label>
+                    <input id="from" list="fromCities" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Місто відправлення">
+                    <datalist id="fromCities">
+                        <option>Київ</option><option>Львів</option><option>Одеса</option><option>Харків</option><option>Дніпро</option>
+                    </datalist>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Куди</label>
+                    <input id="to" list="toCities" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Місто прибуття">
+                    <datalist id="toCities">
+                        <option>Варшава</option><option>Берлін</option><option>Прага</option><option>Братислава</option><option>Відень</option><option>Будапешт</option><option>Краків</option><option>Вроцлав</option><option>Брюссель</option><option>Париж</option>
+                    </datalist>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Дата</label>
+                    <input id="date" type="date" class="w-full p-3 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Тип</label>
+                    <div id="tripType" class="flex">
+                        <button type="button" data-val="oneway" class="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg bg-white text-gray-700">В один бік</button>
+                        <button type="button" data-val="round" class="flex-1 px-4 py-3 border border-gray-300 rounded-r-lg bg-gray-100 text-gray-700">Туди-назад</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Ціна до</label>
+                    <input id="maxPrice" type="number" min="0" step="50" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="грн">
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition">Пошук</button>
+                </div>
+            </form>
+            <div class="flex gap-2 mt-3 text-sm">
+                <span class="px-3 py-1 rounded-full chip">Wi‑Fi</span>
+                <span class="px-3 py-1 rounded-full chip">Розетки</span>
+                <span class="px-3 py-1 rounded-full chip">Туалет</span>
+                <span class="px-3 py-1 rounded-full chip">Нічний рейс</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trips grid -->
+    <section class="py-10">
+        <div class="container mx-auto px-4">
+            <div id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-100 py-10 mt-8">
+        <div class="container mx-auto px-4 text-center text-gray-600">
+            © 2023 GlobalBus
+        </div>
+    </footer>
+
+    <script>
+    const trips = [
+        {from:'Київ',to:'Варшава',start:'08:00',end:'20:00',badge:'Популярний',price:1100,stops:'Київ → Житомир → Рівне → Луцьк → Люблін → Варшава'},
+        {from:'Львів',to:'Прага',start:'07:30',end:'18:30',badge:'Щоденно',price:1300,stops:'Львів → Перемишль → Жешув → Краків → Остравa → Прага'},
+        {from:'Одеса',to:'Будапешт',start:'18:00',end:'08:00',badge:'Новий',price:1500,stops:'Одеса → Умань → Вінниця → Львів → Мішкольц → Будапешт'},
+        {from:'Київ',to:'Краків',start:'06:30',end:'18:30',badge:'Щоденно',price:1000,stops:'Київ → Рівне → Люблін → Краків'},
+        {from:'Київ',to:'Берлін',start:'09:00',end:'06:00+1',badge:'Популярний',price:2100,stops:'Київ → Люблін → Познань → Берлін'},
+        {from:'Львів',to:'Варшава',start:'10:00',end:'16:00',badge:'Щоденно',price:700,stops:'Львів → Люблін → Варшава'},
+        {from:'Львів',to:'Вроцлав',start:'11:00',end:'20:00',badge:'Популярний',price:900,stops:'Львів → Краків → Катовіце → Вроцлав'},
+        {from:'Харків',to:'Варшава',start:'05:30',end:'08:00+1',badge:'Новий',price:2400,stops:'Харків → Київ → Луцьк → Люблін → Варшава'},
+        {from:'Дніпро',to:'Краків',start:'07:00',end:'07:00+1',badge:'Щоденно',price:1900,stops:'Дніпро → Київ → Рівне → Краків'},
+        {from:'Одеса',to:'Варшава',start:'19:00',end:'10:00+1',badge:'Нічний',price:1600,stops:'Одеса → Умань → Вінниця → Люблін → Варшава'},
+        {from:'Київ',to:'Прага',start:'08:30',end:'06:30+1',badge:'Популярний',price:2000,stops:'Київ → Львів → Брно → Прага'},
+        {from:'Львів',to:'Відень',start:'12:00',end:'22:00',badge:'Щоденно',price:1200,stops:'Львів → Братислава → Відень'},
+        {from:'Київ',to:'Братислава',start:'07:45',end:'23:15',badge:'',price:1750,stops:'Київ → Львів → Кошице → Братислава'},
+        {from:'Київ',to:'Будапешт',start:'21:00',end:'10:00+1',badge:'Нічний',price:1850,stops:'Київ → Львів → Мішкольц → Будапешт'},
+        {from:'Львів',to:'Берлін',start:'06:10',end:'22:30',badge:'',price:1400,stops:'Львів → Познань → Франкфурт (Одер) → Берлін'},
+        {from:'Дніпро',to:'Прага',start:'06:00',end:'09:00+1',badge:'',price:2300,stops:'Дніпро → Київ → Львів → Брно → Прага'},
+        {from:'Харків',to:'Прага',start:'04:45',end:'10:30+1',badge:'',price:2600,stops:'Харків → Київ → Львів → Брно → Прага'},
+        {from:'Одеса',to:'Відень',start:'08:15',end:'03:30+1',badge:'',price:2100,stops:'Одеса → Чернівці → Клуж-Напока → Відень'},
+        {from:'Київ',to:'Париж',start:'06:00',end:'14:00+1',badge:'Преміум',price:4200,stops:'Київ → Берлін → Брюссель → Париж'},
+        {from:'Львів',to:'Брюссель',start:'05:30',end:'08:00+1',badge:'',price:3500,stops:'Львів → Познань → Дортмунд → Брюссель'}
+    ];
+
+    const results = document.getElementById('results');
+
+    function card(t){
+        const kmTime = '—';
+        const badgeColor = t.badge==='Популярний'?'bg-blue-100 text-blue-800':
+                           t.badge==='Щоденно'?'bg-purple-100 text-purple-800':
+                           t.badge==='Новий'?'bg-orange-100 text-orange-800':
+                           t.badge==='Нічний'?'bg-slate-100 text-slate-800':
+                           t.badge==='Преміум'?'bg-amber-100 text-amber-800':'hidden';
+        return `
+        <div class="route-card bg-white p-6 rounded-lg shadow-md">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h4 class="text-xl font-bold text-gray-800">${t.from} → ${t.to}</h4>
+                    <p class="text-gray-600">${kmTime}</p>
+                </div>
+                <div class="${badgeColor} px-3 py-1 rounded-full text-sm font-medium">${t.badge}</div>
+            </div>
+            <div class="flex items-center mb-2">
+                <div class="w-2 h-2 rounded-full bg-blue-600 mr-2"></div>
+                <p class="text-gray-700">${t.start} — ${t.from}</p>
+            </div>
+            <div class="flex items-center mb-2">
+                <div class="w-2 h-2 rounded-full bg-green-600 mr-2"></div>
+                <p class="text-gray-700">${t.end} — ${t.to}</p>
+            </div>
+            <details class="mb-6">
+                <summary class="flex items-center gap-2 cursor-pointer text-blue-600 hover:text-blue-800 font-medium">
+                    <i class="fa-solid fa-chevron-down chev transition-transform"></i>
+                    <span>Деталі маршруту</span>
+                </summary>
+                <div class="mt-3 text-gray-700 space-y-2">
+                    <p><span class="font-semibold">Зупинки:</span> ${t.stops}</p>
+                    <p><span class="font-semibold">Багаж:</span> 1 місце до 20 кг + ручна поклажа до 5 кг</p>
+                    <p><span class="font-semibold">Послуги на борту:</span> Wi‑Fi, кондиціонер, розетки</p>
+                </div>
+            </details>
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-gray-600 text-sm">Від</p>
+                    <p class="text-2xl font-bold text-blue-600">${t.price} ₴</p>
+                </div>
+                <a href="booking.html?from=${encodeURIComponent(t.from)}&to=${encodeURIComponent(t.to)}&start=${encodeURIComponent(t.start)}&end=${encodeURIComponent(t.end)}&price=${encodeURIComponent(t.price)}&stops=${encodeURIComponent(t.stops)}" class="text-blue-600 hover:text-blue-800 font-medium">Забронювати</a>
+            </div>
+        </div>`;
+    }
+
+    function render(list){
+        results.innerHTML = list.map(card).join('');
+    }
+    // Prefill from URL
+    const url = new URL(window.location.href);
+    const qFrom = url.searchParams.get('from') || '';
+    const qTo = url.searchParams.get('to') || '';
+    const qDate = url.searchParams.get('date') || '';
+    let qType = url.searchParams.get('type') || 'oneway';
+    if (qFrom) document.getElementById('from').value = qFrom;
+    if (qTo) document.getElementById('to').value = qTo;
+    if (qDate) document.getElementById('date').value = qDate;
+    // toggle buttons
+    const typeWrap = document.getElementById('tripType');
+    const typeBtns = Array.from(typeWrap.querySelectorAll('button'));
+    function setType(val){
+        qType = val;
+        typeBtns.forEach(b=>{
+            const active = b.dataset.val===val;
+            b.classList.toggle('bg-white', active);
+            b.classList.toggle('bg-gray-100', !active);
+        });
+    }
+    setType(qType);
+    typeBtns.forEach(b=> b.addEventListener('click', ()=> setType(b.dataset.val)) );
+    render(trips);
+
+    document.getElementById('filters').addEventListener('submit', (e)=>{
+        e.preventDefault();
+        const f = document.getElementById('from').value.trim();
+        const t = document.getElementById('to').value.trim();
+        const mp = parseInt(document.getElementById('maxPrice').value || '999999', 10);
+        const filtered = trips.filter(x =>
+            (f ? x.from.includes(f) : true) &&
+            (t ? x.to.includes(t) : true) &&
+            x.price <= mp
+        );
+        render(filtered);
+    });
+
+    // mobile menu
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const closeMobileMenu = document.getElementById('closeMobileMenu');
+    if(menuBtn && mobileMenu){ menuBtn.addEventListener('click', ()=> mobileMenu.classList.toggle('hidden')); }
+    if(closeMobileMenu && mobileMenu){ closeMobileMenu.addEventListener('click', ()=> mobileMenu.classList.add('hidden')); }
+    </script>
+</body>
+</html>
+
+

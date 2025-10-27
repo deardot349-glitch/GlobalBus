@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="uk" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlobalBus - Міжнародні автобусні перевезення</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .hero-bg {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1500&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .language-switcher {
+            transition: all 0.3s ease;
+        }
+        
+        .language-switcher:hover {
+            transform: scale(1.05);
+        }
+        
+        .bus-card {
+            transition: all 0.3s ease;
+        }
+        
+        .bus-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .seat {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .seat:hover {
+            transform: scale(1.1);
+        }
+        
+        .seat.selected {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .seat.booked {
+            background-color: #ef4444;
+            color: white;
+            cursor: not-allowed;
+        }
+        
+        .seat.available {
+            background-color: #e5e7eb;
+        }
+        
+        .route-card {
+            transition: all 0.3s ease;
+        }
+        
+        .route-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .testimonial-card {
+            transition: all 0.3s ease;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* Tiny polish for native details */
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] summary .chev { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Top Bar -->
+    <div class="bg-blue-900 text-white py-2 px-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <div>
+                    <i class="fas fa-phone-alt mr-2"></i>
+                    <span>+38 (050) 123-45-67</span>
+                </div>
+                <div>
+                    <i class="fas fa-envelope mr-2"></i>
+                    <span>info@globalbus.com</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="flex items-center language-switcher">
+                    <span class="mr-2">UA</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" value="" class="sr-only peer" id="languageToggle">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        <span class="ml-2">EN</span>
+                    </label>
+                </div>
+                <div class="flex space-x-2">
+                    <a href="#" class="text-white hover:text-blue-200"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-white hover:text-blue-200"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-white hover:text-blue-200"><i class="fab fa-telegram"></i></a>
+                    <a href="#" class="text-white hover:text-blue-200"><i class="fab fa-whatsapp"></i></a>
+                </div>
+                <div class="flex items-center bg-blue-800 px-3 py-1 rounded-full">
+                    <i class="fas fa-clock mr-2"></i>
+                    <span>Працюємо 24/7</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="index.html#home" class="text-2xl font-bold text-blue-900">Global<span class="text-blue-600">Bus</span></a>
+                </div>
+                
+                <div class="hidden md:flex space-x-8">
+                    <a href="#about" class="text-gray-700 hover:text-blue-600 font-medium">Про нас</a>
+                    <a href="trips.html" class="text-gray-700 hover:text-blue-600 font-medium">Маршрути</a>
+                    <a href="#reviews" class="text-gray-700 hover:text-blue-600 font-medium">Відгуки</a>
+                    <a href="#footer" class="text-gray-700 hover:text-blue-600 font-medium">Контакти</a>
+                </div>
+                
+                <div class="hidden md:block">
+                    <a href="#booking" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-medium transition duration-300 shadow-lg hover:shadow-xl">Забронювати</a>
+                </div>
+                
+                <div class="md:hidden">
+                    <button id="menuBtn" class="text-gray-700 focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile menu -->
+            <div id="mobileMenu" class="hidden md:hidden bg-white py-6 px-6 fixed inset-0 shadow-lg border-t z-40 overflow-y-auto">
+                <div class="flex flex-col space-y-4">
+                    <a href="#about" class="text-gray-800 text-lg hover:text-blue-600 font-medium">Про нас</a>
+                    <a href="trips.html" class="text-gray-800 text-lg hover:text-blue-600 font-medium">Маршрути</a>
+                    <a href="#reviews" class="text-gray-800 text-lg hover:text-blue-600 font-medium">Відгуки</a>
+                    <a href="#footer" class="text-gray-800 text-lg hover:text-blue-600 font-medium">Контакти</a>
+                    <a href="#booking" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-semibold text-center">Забронювати</a>
+                    <button id="closeMobileMenu" class="mt-6 text-gray-500">Закрити</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-bg text-white h-[80vh] md:h-[75vh] flex items-center">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 animate-fadeIn">Подорожуйте Європою з комфортом</h1>
+            <p class="text-lg md:text-2xl mb-8 max-w-2xl mx-auto animate-fadeIn">Надійні міжнародні рейси щодня. Вигідні ціни, сучасні автобуси, підтримка 24/7.</p>
+            <a href="trips.html" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full font-bold text-lg md:text-xl transition duration-300 shadow-xl hover:shadow-2xl animate-fadeIn">
+                <i class="fas fa-ticket-alt"></i>
+                Забронювати квиток
+            </a>
+        </div>
+    </section>
+
+    <!-- About Section (more compact) -->
+    <section id="about" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-3">Про нашу компанію</h2>
+                <div class="w-16 h-1 bg-blue-600 mx-auto"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Наша місія — ваш комфорт</h3>
+                    <p class="text-gray-600 mb-3">GlobalBus — лідер міжнародних автобусних перевезень з 2005 року. Ми поєднали кращі традиції європейського сервісу з українською гостинністю.</p>
+                    <p class="text-gray-600 mb-5">Щодня перевозимо тисячі пасажирів по Європі, гарантуючи безпеку, пунктуальність і комфорт.</p>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="text-blue-600 mb-2">
+                                <i class="fas fa-shield-alt text-3xl"></i>
+                            </div>
+                            <h4 class="font-bold text-gray-800 mb-2">Безпека</h4>
+                            <p class="text-gray-600">Сучасні автобуси з системами контролю</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="text-blue-600 mb-2">
+                                <i class="fas fa-clock text-3xl"></i>
+                            </div>
+                            <h4 class="font-bold text-gray-800 mb-2">Пунктуальність</h4>
+                            <p class="text-gray-600">95% рейсів прибувають за розкладом</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="text-blue-600 mb-2">
+                                <i class="fas fa-wifi text-3xl"></i>
+                            </div>
+                            <h4 class="font-bold text-gray-800 mb-2">Комфорт</h4>
+                            <p class="text-gray-600">Wi-Fi, кондиціонер, розетки в кожному ряду</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="text-blue-600 mb-2">
+                                <i class="fas fa-globe-europe text-3xl"></i>
+                            </div>
+                            <h4 class="font-bold text-gray-800 mb-2">Маршрути</h4>
+                            <p class="text-gray-600">30+ напрямків по 15 країнах Європи</p>
+                        </div>
+                    </div>
+                    <a href="trips.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-medium transition duration-300">Переглянути маршрути</a>
+                </div>
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1619025873874-1edc5f986c55?auto=format&fit=crop&w=1200&q=80" alt="Mercedes Sprinter на мальовничій дорозі" class="rounded-lg shadow-xl w-full object-cover h-80 md:h-full">
+                    <div class="absolute -bottom-6 -left-6 bg-white p-4 rounded-lg shadow-lg hidden md:block">
+                        <div class="flex items-center">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-award text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Міжнародні сертифікати</h4>
+                                <p class="text-gray-600">ISO 9001:2015</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Routes Section -->
+    <section id="routes" class="py-20 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Наші маршрути</h2>
+                <div class="w-20 h-1 bg-blue-600 mx-auto"></div>
+            </div>
+            
+            <!-- Route Search (improved, with one-way/round-trip) -->
+            <div class="bg-white p-6 rounded-xl shadow-lg mb-12">
+                <form id="homeSearch" class="grid grid-cols-1 md:grid-cols-6 gap-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Звідки</label>
+                        <input id="hsFrom" list="fromCities" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Місто відправлення">
+                        <datalist id="fromCities">
+                            <option>Київ</option><option>Львів</option><option>Одеса</option><option>Харків</option><option>Дніпро</option>
+                        </datalist>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Куди</label>
+                        <input id="hsTo" list="toCities" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Місто прибуття">
+                        <datalist id="toCities">
+                            <option>Варшава</option><option>Берлін</option><option>Прага</option><option>Братислава</option><option>Відень</option><option>Будапешт</option><option>Краків</option><option>Вроцлав</option>
+                        </datalist>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Дата відправлення</label>
+                        <input id="hsDate" type="date" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Тип</label>
+                        <div id="hsType" class="flex">
+                            <button type="button" data-val="oneway" class="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg bg-white text-gray-700">В один бік</button>
+                            <button type="button" data-val="round" class="flex-1 px-4 py-3 border border-gray-300 rounded-r-lg bg-gray-100 text-gray-700">Туди-назад</button>
+                        </div>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition">Пошук</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Popular Routes -->
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">Популярні напрямки</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" id="homeRoutes">
+                
+            </div>
+            
+            <div class="text-center">
+                <a href="trips.html" class="inline-block border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 py-3 rounded-full font-medium transition duration-300">Всі маршрути</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fleet Section -->
+    <section id="fleet" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Наш автопарк</h2>
+                <div class="w-20 h-1 bg-blue-600 mx-auto"></div>
+                <p class="text-gray-600 max-w-2xl mx-auto mt-4">Сучасні автобуси преміум-класу для вашої комфортної подорожі</p>
+            </div>
+            
+            <!-- Removed tabs for simplicity -->
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Bus 1 -->
+                <div class="bus-card micro-bus bg-white rounded-lg overflow-hidden shadow-lg">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1619025873874-1edc5f986c55?auto=format&fit=crop&w=1200&q=80" alt="Mercedes Sprinter" class="w-full h-64 object-cover">
+                        <div class="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">20 місць</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Mercedes Sprinter</h3>
+                        <p class="text-gray-600 mb-4">Ідеальний для малих груп та індивідуальних подорожей</p>
+                        
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">Wi-Fi</span>
+                            <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">Кондиціонер</span>
+                            <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">Розетки</span>
+                            <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">Клімат контроль</span>
+                        </div>
+                        
+                        <details class="mb-6">
+                            <summary class="flex items-center gap-2 cursor-pointer text-blue-600 hover:text-blue-800 font-medium">
+                                <i class="fa-solid fa-chevron-down chev transition-transform"></i>
+                                <span>Деталі автобуса</span>
+                            </summary>
+                            <div class="mt-3 text-gray-700 space-y-2">
+                                <p><span class="font-semibold">Роки випуску:</span> 2019–2022</p>
+                                <p><span class="font-semibold">Безпека:</span> ABS, ESP, двозонний клімат‑контроль</p>
+                                <p><span class="font-semibold">Комфорт:</span> Регульовані сидіння, USB біля кожного місця</p>
+                            </div>
+                        </details>
+                        
+                        <a href="#booking" class="inline-block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-2 rounded-lg font-medium transition duration-300">Обрати цей автобус</a>
+                    </div>
+                </div>
+                
+                <!-- Bus 2 -->
+                <div class="bus-card large-bus bg-white rounded-lg overflow-hidden shadow-lg">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1607525309988-3c825a6f24a7?auto=format&fit=crop&w=1200&q=80" alt="Setra S515HD" class="w-full h-64 object-cover">
+                        <div class="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">50 місць</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Setra S515HD</h3>
+                        <p class="text-gray-600 mb-4">Преміум клас для довгих міжнародних маршрутів</p>
+                        
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">Wi-Fi</span>
+                            <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">Кондиціонер</span>
+                            <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">Розетки</span>
+                            <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">Туалет</span>
+                            <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">Кава-машина</span>
+                            <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">Кінотеатр</span>
+                        </div>
+                        
+                        <details class="mb-6">
+                            <summary class="flex items-center gap-2 cursor-pointer text-blue-600 hover:text-blue-800 font-medium">
+                                <i class="fa-solid fa-chevron-down chev transition-transform"></i>
+                                <span>Деталі автобуса</span>
+                            </summary>
+                            <div class="mt-3 text-gray-700 space-y-2">
+                                <p><span class="font-semibold">Роки випуску:</span> 2018–2021</p>
+                                <p><span class="font-semibold">Безпека:</span> Lane Assist, Adaptive Cruise, камери 360°</p>
+                                <p><span class="font-semibold">Комфорт:</span> Широкі сидіння, мультимедіа, холодильник</p>
+                            </div>
+                        </details>
+                        
+                        <a href="#booking" class="inline-block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-2 rounded-lg font-medium transition duration-300">Обрати цей автобус</a>
+                    </div>
+                </div>
+                
+                <!-- Bus 3 -->
+                <div class="bus-card micro-bus bg-white rounded-lg overflow-hidden shadow-lg">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1557223562-6c77ef16210f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80" alt="Volkswagen Crafter" class="w-full h-64 object-cover">
+                        <div class="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">16 місць</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Volkswagen Crafter</h3>
+                        <p class="text-gray-600 mb-4">Компактний комфорт для невеликих компаній</p>
+                        
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">Wi-Fi</span>
+                            <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">Кондиціонер</span>
+                            <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">Розетки</span>
+                        </div>
+                        
+                        <details class="mb-6">
+                            <summary class="flex items-center gap-2 cursor-pointer text-blue-600 hover:text-blue-800 font-medium">
+                                <i class="fa-solid fa-chevron-down chev transition-transform"></i>
+                                <span>Деталі автобуса</span>
+                            </summary>
+                            <div class="mt-3 text-gray-700 space-y-2">
+                                <p><span class="font-semibold">Роки випуску:</span> 2020–2023</p>
+                                <p><span class="font-semibold">Безпека:</span> ABS, ESP, моніторинг тиску в шинах</p>
+                                <p><span class="font-semibold">Комфорт:</span> Панорамні вікна, USB/Type‑C порти</p>
+                            </div>
+                        </details>
+                        
+                        <a href="#booking" class="inline-block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-2 rounded-lg font-medium transition duration-300">Обрати цей автобус</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Section removed: now we use trips.html + booking.html flows -->
+
+    <!-- Features Section -->
+    <section class="py-16 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Чому обирають нас</h2>
+                <div class="w-16 h-1 bg-blue-600 mx-auto"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-check-circle text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Гарантоване відправлення</h3>
+                    <p class="text-gray-600">Відправляємо за розкладом незалежно від заповненості</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-lock text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Безпека</h3>
+                    <p class="text-gray-600">Досвідчені водії та регулярний техогляд</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-wifi text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Сучасні технології</h3>
+                    <p class="text-gray-600">Швидкісний Wi‑Fi, індивідуальні екрани, USB</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-headset text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Підтримка 24/7</h3>
+                    <p class="text-gray-600">Оперативна допомога у будь-який час</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="reviews" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Відгуки наших пасажирів</h2>
+                <div class="w-20 h-1 bg-blue-600 mx-auto"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="testimonial-card bg-gray-50 p-6 rounded-lg">
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/women/43.jpg" alt="User" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-bold text-gray-800">Оксана Кузьменко</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">"Подорожувала з Києва до Варшави. Дуже комфортний автобус, привітний водій. Приїхали точно за розкладом, навіть на 10 хвилин раніше. Обов'язково скористаюся цим перевізником знову!"</p>
+                    <p class="text-gray-400 text-sm">15 липня 2023</p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="testimonial-card bg-gray-50 p-6 rounded-lg">
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-bold text-gray-800">Андрій Петренко</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">"Вперше їхав з Львова до Праги. Wi-Fi працював стабільно весь шлях, що дозволило мені продуктивно працювати. Сидіння дуже зручні, простір для ніг більший, ніж у літаках економ-класу."</p>
+                    <p class="text-gray-400 text-sm">3 серпня 2023</p>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="testimonial-card bg-gray-50 p-6 rounded-lg">
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="User" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-bold text-gray-800">Наталія Іванова</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">"Дуже задоволена сервісом! Їздила з дітьми, водій допоміг із багажем, у салоні було чисто та комфортно. Діти могли дивитись фільми на власних планшетах завдяки розеткам біля кожного місця."</p>
+                    <p class="text-gray-400 text-sm">22 червня 2023</p>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <a href="#" class="inline-block border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 py-3 rounded-full font-medium transition duration-300">Більше відгуків</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section removed per request -->
+    
+
+    <!-- FAQ Section -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Часті запитання</h2>
+                <div class="w-20 h-1 bg-blue-600 mx-auto"></div>
+            </div>
+            
+            <div class="max-w-3xl mx-auto">
+                <div class="border-b border-gray-200 py-4">
+                    <button class="flex justify-between items-center w-full text-left font-medium text-gray-800 focus:outline-none">
+                        <span>Які документи потрібні для перетину кордону?</span>
+                        <i class="fas fa-chevron-down text-blue-600"></i>
+                    </button>
+                    <div class="mt-2 text-gray-600">
+                        <p>Для перетину кордону необхідно мати дійсний закордонний паспорт, візу (якщо вона потрібна для країни призначення), медичну страховку, а також інші документи, що можуть знадобитися відповідно до вимог країни призначення.</p>
+                    </div>
+                </div>
+                
+                <div class="border-b border-gray-200 py-4">
+                    <button class="flex justify-between items-center w-full text-left font-medium text-gray-800 focus:outline-none">
+                        <span>Як можна сплатити за квиток?</span>
+                        <i class="fas fa-chevron-down text-blue-600"></i>
+                    </button>
+                    <div class="mt-2 text-gray-600">
+                        <p>Ми приймаємо оплату банківськими картками VISA, Mastercard, через системи Google Pay та Apple Pay, а також через термінали у наших офісах. Також доступна оплата через Privat24 та інші системи інтернет-банкінгу.</p>
+                    </div>
+                </div>
+                
+                <div class="border-b border-gray-200 py-4">
+                    <button class="flex justify-between items-center w-full text-left font-medium text-gray-800 focus:outline-none">
+                        <span>Які норми багажу діють у автобусах?</span>
+                        <i class="fas fa-chevron-down text-blue-600"></i>
+                    </button>
+                    <div class="mt-2 text-gray-600">
+                        <p>Кожен пасажир має право безкоштовно перевозити 1 багажне місце вагою до 20 кг та розміром не більше 100 см за сумою трьох вимірів, а також 1 ручну поклажу вагою до 5 кг розміром до 40х30х20 см.</p>
+                    </div>
+                </div>
+                
+                <div class="border-b border-gray-200 py-4">
+                    <button class="flex justify-between items-center w-full text-left font-medium text-gray-800 focus:outline-none">
+                        <span>Чи можна скасувати або змінити бронювання?</span>
+                        <i class="fas fa-chevron-down text-blue-600"></i>
+                    </button>
+                    <div class="mt-2 text-gray-600">
+                        <p>Так, ви можете скасувати або змінити бронювання, але у деяких випадках може стягуватися комісія. Детальні умови залежать від тарифу, за яким було придбано квиток.</p>
+                    </div>
+                </div>
+                
+                <div class="border-b border-gray-200 py-4">
+                    <button class="flex justify-between items-center w-full text-left font-medium text-gray-800 focus:outline-none">
+                        <span>Чи є у автобусах Wi-Fi та розетки?</span>
+                        <i class="fas fa-chevron-down text-blue-600"></i>
+                    </button>
+                    <div class="mt-2 text-gray-600">
+                        <p>Так, усі наші автобуси оснащені безкоштовним Wi-Fi (з обмеженням трафіку) та розетками або USB-портами біля кожного місця. У автобусах преміум-класу також є індивідуальні екрани з розважальним контентом.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section removed per request -->
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">GlobalBus</h3>
+                    <p class="text-gray-400 mb-4">Ми працюємо для того, щоб Ваші подорожі були комфортними, безпечними та незабутніми.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Навігація</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-400 hover:text-white transition duration-300">Головна</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition duration-300">Про нас</a></li>
+                        <li><a href="#routes" class="text-gray-400 hover:text-white transition duration-300">Маршрути</a></li>
+                        <li><a href="#fleet" class="text-gray-400 hover:text-white transition duration-300">Наш автопарк</a></li>
+                        <li><a href="#reviews" class="text-gray-400 hover:text-white transition duration-300">Відгуки</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white transition duration-300">Контакти</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Інформація</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Політика конфіденційності</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Правила перевезення</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Умови користування сайтом</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Програма лояльності</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Вакансії</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Контакти</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-3 text-blue-500"></i>
+                            <span class="text-gray-400">м. Київ, вул. Хрещатик, 44</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-phone-alt mt-1 mr-3 text-blue-500"></i>
+                            <span class="text-gray-400">+38 (050) 123-45-67</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-envelope mt-1 mr-3 text-blue-500"></i>
+                            <span class="text-gray-400">info@globalbus.com</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-clock mt-1 mr-3 text-blue-500"></i>
+                            <span class="text-gray-400">Підтримка клієнтів: 24/7</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0 text-center md:text-left">
+                        <p class="text-gray-400">© 2023 GlobalBus. Всі права захищені.</p>
+                    </div>
+                    <div class="flex flex-wrap justify-center space-x-4">
+                        <img src="https://via.placeholder.com/40x25?text=Visa" alt="Visa" class="h-6">
+                        <img src="https://via.placeholder.com/40x25?text=MC" alt="Mastercard" class="h-6">
+                        <img src="https://via.placeholder.com/40x25?text=PP" alt="PayPal" class="h-6">
+                        <img src="https://via.placeholder.com/40x25?text=AP" alt="Apple Pay" class="h-6">
+                        <img src="https://via.placeholder.com/40x25?text=GP" alt="Google Pay" class="h-6">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Fixed Booking Button: now links to trips -->
+    <div class="fixed bottom-6 right-6">
+        <a href="trips.html" class="bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-xl hover:shadow-2xl transition duration-300">
+            <i class="fas fa-ticket-alt text-xl"></i>
+        </a>
+    </div>
+
+    <!-- Language Modal -->
+    <div id="languageModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Оберіть мову</h3>
+                <button id="closeLanguageModal" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <button class="border border-gray-300 rounded-lg p-4 text-center hover:bg-blue-100">
+                    <span class="font-medium">Українська</span>
+                </button>
+                <button class="border border-gray-300 rounded-lg p-4 text-center hover:bg-blue-100">
+                    <span class="font-medium">English</span>
+                </button>
+                <button class="border border-gray-300 rounded-lg p-4 text-center hover:bg-blue-100">
+                    <span class="font-medium">Polski</span>
+                </button>
+                <button class="border border-gray-300 rounded-lg p-4 text-center hover:bg-blue-100">
+                    <span class="font-medium">Deutsch</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        if (menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+        const closeMobileMenu = document.getElementById('closeMobileMenu');
+        if (closeMobileMenu && mobileMenu) {
+            closeMobileMenu.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+        }
+        
+        // Language Toggle
+        const languageToggle = document.getElementById('languageToggle');
+        const languageModal = document.getElementById('languageModal');
+        const closeLanguageModal = document.getElementById('closeLanguageModal');
+        
+        if (languageToggle) {
+            languageToggle.addEventListener('change', () => {
+                if(languageToggle.checked) {
+                    console.log('Switched to English');
+                } else {
+                    console.log('Switched to Ukrainian');
+                }
+            });
+        }
+        
+        // Show language modal when clicking language area (fix: ensure element exists)
+        const languageText = document.querySelector('.language-switcher');
+        if (languageText && languageModal) {
+            languageText.addEventListener('click', (e) => {
+                if(!e.target.closest('label')) {
+                    languageModal.classList.remove('hidden');
+                }
+            });
+        }
+        
+        if (closeLanguageModal && languageModal) {
+            closeLanguageModal.addEventListener('click', () => {
+                languageModal.classList.add('hidden');
+            });
+        }
+        
+        // Close language modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if(e.target === languageModal) {
+                languageModal.classList.add('hidden');
+            }
+        });
+        
+        // Bus tabs
+        // Tabs removed
+        
+        // FAQ Accordion
+        const faqButtons = document.querySelectorAll('section button');
+        
+        faqButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const content = button.nextElementSibling;
+                const icon = button.querySelector('i');
+                
+                if(content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                }
+            });
+        });
+        
+        // Smooth scrolling for on-page anchors only
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if(!targetElement) return;
+                e.preventDefault();
+                window.scrollTo({ top: targetElement.offsetTop - 80, behavior: 'smooth' });
+            });
+        });
+
+        // Home search → trips
+        const homeSearch = document.getElementById('homeSearch');
+        if (homeSearch) {
+            homeSearch.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const from = encodeURIComponent(document.getElementById('hsFrom').value || '');
+                const to = encodeURIComponent(document.getElementById('hsTo').value || '');
+                const date = encodeURIComponent(document.getElementById('hsDate').value || '');
+                // read type from toggle
+                const hsType = document.getElementById('hsType');
+                const active = Array.from(hsType.querySelectorAll('button')).find(b => b.classList.contains('bg-white'));
+                const type = encodeURIComponent((active && active.dataset.val) || 'oneway');
+                const url = `trips.html?from=${from}&to=${to}&date=${date}&type=${type}`;
+                window.location.href = url;
+            });
+        }
+
+        // init home type toggle
+        (function(){
+            const hsType = document.getElementById('hsType');
+            if (!hsType) return;
+            const btns = Array.from(hsType.querySelectorAll('button'));
+            function set(val){
+                btns.forEach(b=>{
+                    const active = b.dataset.val===val;
+                    b.classList.toggle('bg-white', active);
+                    b.classList.toggle('bg-gray-100', !active);
+                });
+            }
+            btns.forEach(b=> b.addEventListener('click', ()=> set(b.dataset.val)) );
+            set('oneway');
+        })();
+
+        // Populate 3 homepage routes using same renderer as trips
+        (function(){
+            const container = document.getElementById('homeRoutes');
+            if (!container) return;
+            const sample = [
+                {from:'Київ',to:'Варшава',start:'08:00',end:'20:00',badge:'Популярний',price:1100,stops:'Київ → Житомир → Рівне → Луцьк → Люблін → Варшава'},
+                {from:'Львів',to:'Прага',start:'07:30',end:'18:30',badge:'Щоденно',price:1300,stops:'Львів → Перемишль → Жешув → Краків → Остравa → Прага'},
+                {from:'Одеса',to:'Будапешт',start:'18:00',end:'08:00',badge:'Новий',price:1500,stops:'Одеса → Умань → Вінниця → Львів → Мішкольц → Будапешт'},
+            ];
+            function card(t){
+                const badgeColor = t.badge==='Популярний'?'bg-blue-100 text-blue-800':
+                                   t.badge==='Щоденно'?'bg-purple-100 text-purple-800':
+                                   t.badge==='Новий'?'bg-orange-100 text-orange-800':'hidden';
+                return `
+                <div class="route-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800">${t.from} → ${t.to}</h4>
+                            <p class="text-gray-600">—</p>
+                        </div>
+                        <div class="${badgeColor} px-3 py-1 rounded-full text-sm font-medium">${t.badge}</div>
+                    </div>
+                    <div class="flex items-center mb-2">
+                        <div class="w-2 h-2 rounded-full bg-blue-600 mr-2"></div>
+                        <p class="text-gray-700">${t.start} — ${t.from}</p>
+                    </div>
+                    <div class="flex items-center mb-2">
+                        <div class="w-2 h-2 rounded-full bg-green-600 mr-2"></div>
+                        <p class="text-gray-700">${t.end} — ${t.to}</p>
+                    </div>
+                    <details class="mb-6">
+                        <summary class="flex items-center gap-2 cursor-pointer text-blue-600 hover:text-blue-800 font-medium">
+                            <i class="fa-solid fa-chevron-down chev transition-transform"></i>
+                            <span>Деталі маршруту</span>
+                        </summary>
+                        <div class="mt-3 text-gray-700 space-y-2">
+                            <p><span class="font-semibold">Зупинки:</span> ${t.stops}</p>
+                            <p><span class="font-semibold">Багаж:</span> 1 місце до 20 кг + ручна поклажа до 5 кг</p>
+                            <p><span class="font-semibold">Послуги на борту:</span> Wi‑Fi, кондиціонер, розетки</p>
+                        </div>
+                    </details>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-gray-600 text-sm">Від</p>
+                            <p class="text-2xl font-bold text-blue-600">${t.price} ₴</p>
+                        </div>
+                        <a href="booking.html?from=${encodeURIComponent(t.from)}&to=${encodeURIComponent(t.to)}&start=${encodeURIComponent(t.start)}&end=${encodeURIComponent(t.end)}&price=${encodeURIComponent(t.price)}&stops=${encodeURIComponent(t.stops)}" class="text-blue-600 hover:text-blue-800 font-medium">Забронювати</a>
+                    </div>
+                </div>`;
+            }
+            container.innerHTML = sample.map(card).join('');
+        })();
+    </script>
+</body>
+</html>
+
